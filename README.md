@@ -17,7 +17,7 @@ python main.py aUb
 
 ### Or You Can See The Demo Video
 
-URL: ()[]
+URL: [https://callmejp.github.io/2019/12/28/LTL-NBA/](https://callmejp.github.io/2019/12/28/LTL-NBA/)
 
 ### Background
 

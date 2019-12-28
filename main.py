@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # @Time    : 2019.12.28
-# @Author  : 金鹏
+# @Author  : 金鹏, 王献辉， 张小禹
 # @FileName: main.py
 from util import packageFormula, formulaToStr, atomicToStr, getType
 from graphviz import Digraph
@@ -11,7 +11,12 @@ import argparse
 
 def convertToDNF(subformula, level):
     """
-    description: convert the LTL formula to the DNF form
+    @description: convert the LTL formula to the DNF form
+    @param: 
+        subformula{str}: LTL formula.
+             level{int}: recurrent Level.
+    @return: 
+        dict: each object indicates the CNF clause.
     """
     # Termination
     if  len(subformula) == 1:
@@ -20,8 +25,32 @@ def convertToDNF(subformula, level):
             return []
         return packageFormula(subformula, 'T')
     elif subformula[0] == 'X':
-        return packageFormula('T', subformula[1:])
-    
+        # process the CNF in X()
+        localFormula = subformula[2:-1]
+        posList = []
+        pos = 0
+        cnt = 0
+        for t in localFormula:
+            if t == '(':
+                cnt += 1
+            elif t == ')':
+                cnt -= 1
+            elif t == 'O' and cnt == 0:
+               posList.append(pos)
+            pos += 1
+
+        if len(posList) == 0: 
+            return packageFormula('T', subformula[1:])
+        else:
+            posList.append(len(localFormula))
+            tempList = []
+            st = 0
+            for ed in posList:
+                tempFormula = localFormula[st:ed]
+                tempList += packageFormula('T', tempFormula)
+                st = ed + 1
+            print("CNF occurs in the X:", tempList)
+            return tempList
     
     left = 'left'
     operater = 'operater'
@@ -61,17 +90,18 @@ def convertToDNF(subformula, level):
     if operater == 'A':
         # t: aAbAcAX()
         # And : termination
-        
         t1 = convertToDNF(left, level+1)
         t2 = convertToDNF(right, level+1)
         if t1 == [] or t2 == []:
             # special case for false
             return []
-        t1 = t1[0]
-        t2 = t2[0]
-        atomicList = list(set(t1['atomic'] + t2['atomic']))
-        xFormula = list(set(t1['xFormula'] + t2['xFormula']))
-        formulaList = packageFormula(atomicList, xFormula)
+        # multiply of the sets
+        formulaList = []
+        for left in t1:
+            for right in t2:
+                atomicList = list(set(left['atomic'] + right['atomic']))
+                xFormula = list(set(left['xFormula'] + right['xFormula']))
+                formulaList += packageFormula(atomicList, xFormula)
         return formulaList
     elif operater == 'R':
         t1 = convertToDNF('('+left+')A('+right+')', level+1)
@@ -123,10 +153,12 @@ def cleanFormula(localList):
 
 def drawAutomata():
     """
-    @name: drawAutomata
     @description: Draw the graph according to the nodes & edges
     @param: 
-    @return:  
+        subformula{str}: LTL formula.
+             level{int}: recurrent Level.
+    @return: 
+        localCodeList{list}: each element is a segment of code.
     """
     global typeOfFormula, testFormula
 
@@ -162,11 +194,11 @@ def updateMap(name):
     nodeCount += 1
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("formula", type=str, help="LTL formula you wanna test.")
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("formula", type=str, help="LTL formula you wanna test.")
+    # args = parser.parse_args()
 
-    testFormula = args.formula
+    testFormula = 'aR(Xb)'
 
     typeOfFormula = getType(testFormula)
 

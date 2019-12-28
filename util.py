@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# @Time    : 2019.12.28
+# @Author  : 肖思慧
+# @FileName: util.py
+
+
 def packageFormula(atomic, xFormula):
     if type(atomic) != type([]):
         atomic = [atomic]
@@ -11,11 +18,14 @@ def formulaToStr(localList):
     """
     description: combine the elements in the formula list to a string
     """
-    tempStr = ''
-    for t in localList:
-        tempStr += t
-    
-    return tempStr
+    if len(localList) <= 1:
+        return localList[0]
+    else:
+        tempStr = '(' + localList[0] + ')'
+        for t in localList[1:]:
+            tempStr += 'A(' + t + ')'
+        return tempStr
+
 
 def atomicToStr(localList):
     """
