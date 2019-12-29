@@ -2,3 +2,6 @@
 try.py
 *.pdf
 *.html
+*.spec
+build/
+dist/

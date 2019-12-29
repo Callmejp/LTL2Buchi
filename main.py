@@ -194,11 +194,12 @@ def updateMap(name):
     nodeCount += 1
 
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("formula", type=str, help="LTL formula you wanna test.")
-    # args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("formula", type=str, help="LTL formula you wanna test.")
+    args = parser.parse_args()
 
-    testFormula = 'aR(Xb)'
+    # testFormula = '(X(aAb))R(cOd)'
+    testFormula = args.formula
 
     typeOfFormula = getType(testFormula)
 
@@ -214,20 +215,20 @@ if __name__ == '__main__':
     while not q.empty():
         currentFormula = q.get()
         listOfDNF = convertToDNF(currentFormula, 0)
-        print(listOfDNF)
+        # print(listOfDNF)
         cleanFormula(listOfDNF)
-        print(listOfDNF)
+        # print(listOfDNF)
 
         for ele in listOfDNF:
             newFormula = formulaToStr(ele['xFormula'])
-            print("new Formula:", newFormula)
+            # print("new Formula:", newFormula)
             if mapDict.get(newFormula, -1) == -1:
                 q.put(newFormula)
                 updateMap(newFormula)
                 nodes.append(newFormula)
             
             newAtomic = atomicToStr(ele['atomic'])
-            print("new Atomic", newAtomic)
+            # print("new Atomic", newAtomic)
 
             edges.append({'u': currentFormula, 'v': newFormula, 'label': newAtomic})
     
